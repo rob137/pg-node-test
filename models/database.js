@@ -1,21 +1,14 @@
-const { Pool, Client } = require('pg')
-const connectionString = 'postgres://localhost/todo'
+const { Pool } = require('pg');
 
 const pool = new Pool({
-  connectionString: connectionString,
-})
+  user: 'postgres',
+  host: 'localhost',
+  database: 'auth',
+  port: '5432'
+});
 
-pool.query('SELECT NOW()', (err, res) => {
-  console.log(err, res)
-  pool.end()
-})
-
-const client = new Client({
-  connectionString: connectionString,
-})
-client.connect()
-
-client.query('SELECT NOW()', (err, res) => {
-  console.log(err, res)
-  client.end()
-})
+module.exports = {
+  query: (text, params, callback) => {
+    return pool.query(text, params, callback);
+  },
+};
