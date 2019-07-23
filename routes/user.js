@@ -1,12 +1,5 @@
 const db = require('../models/database');
 
-function readUsers(req, res) {
-  db.query('SELECT * FROM users', [], (err, dbRes) => {
-    if (err) { return handleError(res, err); }
-    return res.send(dbRes.rows[0]);
-  });
-}
-
 function insertUser(req, res) {
   const text = 'INSERT INTO users(email, admin) VALUES($1, $2)';
   const { email, admin } = req.body;
@@ -15,6 +8,21 @@ function insertUser(req, res) {
     if (err) { return handleError(res, err); }
     return res.send(dbRes);
   });
+}
+
+function readUsers(req, res) {
+  db.query('SELECT * FROM users', [], (err, dbRes) => {
+    if (err) { return handleError(res, err); }
+    return res.send(dbRes.rows);
+  });
+}
+
+function deleteUser(req, res) {
+  const text = 'DELETE FROM users WHERE email = $1';
+  db.query(text, [req.body.email], (err, dbRes) => {
+    if (err) { return handleError(res.err); }
+    return res.send(dbRes);
+  })
 }
 
 function handleError(res, err) {
@@ -26,4 +34,4 @@ function handleError(res, err) {
   }
 }
 
-module.exports = { readUsers, insertUser };
+module.exports = { insertUser, readUsers, deleteUser };
