@@ -1,11 +1,7 @@
 const { Pool } = require('pg');
 
-const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'auth',
-  port: '5432'
-});
+// .env file must set PGUSER, PGDATABASE
+const pool = new Pool();
 
 module.exports = {
   query: (text, params, callback) => {

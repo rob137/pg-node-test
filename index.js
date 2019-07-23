@@ -1,6 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const { Client } = require('pg');
+const db = require('./models/database');
 
 const port = process.env.PORT || 5000;
 dotenv.config();
@@ -8,40 +8,28 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-const client = new Client({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'auth',
-  port: '5432'
-});
-
 app.get('/', async (req, res) => {
-  const users = await readUsers();
-  res.setHeader('content-type', 'application/json');
-  res.send(users);
+  await db.query('SELECT * FROM users', [], (err, dbRes) => {
+    if (err) { return handleError(res, err); }
+    res.send(dbRes.rows[0]);
+  });
 });
 
-app.listen(port, () => {
-  console.log(`Server is listening on port ${port}`);
-});
+app.listen(port, () => console.log(`Server is listening on port ${port}`));
 
-connectToDb();
-
-async function connectToDb() {
-  try {
-    await client.connect();
-  }
-  catch(e) {
-    console.error(`Failed to connect ${e}`);
+function handleError(res, err) {
+  if (err.errno === 'ECONNREFUSED') {
+    return res.status(500).send({ error: 'Unable to connect to database' });
+  } else {
+    return res.status(500).send({ error: 'Something went wrong' });
   }
 }
 
-async function readUsers() {
-  try {
-    const response = await client.query('SELECT * FROM users');
-    return response.rows;
-  }
-  catch(e) {
-    return [];
-  }
-}
+// async function connectToDb() {
+//   try {
+//     await client.connect();
+//   }
+//   catch(e) {
+//     console.error(`Failed to connect ${e}`);
+//   }
+// }
