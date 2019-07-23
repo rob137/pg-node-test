@@ -17,6 +17,16 @@ function readUsers(req, res) {
   });
 }
 
+function updateUser(req, res) {
+  const text = 'UPDATE users SET email = $1 WHERE email = $2'
+  const { email, newEmail } = req.body;
+  const values = [email, newEmail];
+  db.query(text, values, (err, dbRes) => {
+    if (err) { return handleError(res, err); }
+    return res.send(dbRes.rows);
+  })
+}
+
 function deleteUser(req, res) {
   const text = 'DELETE FROM users WHERE email = $1';
   db.query(text, [req.body.email], (err, dbRes) => {
@@ -34,4 +44,4 @@ function handleError(res, err) {
   }
 }
 
-module.exports = { insertUser, readUsers, deleteUser };
+module.exports = { insertUser, readUsers, updateUser, deleteUser };
